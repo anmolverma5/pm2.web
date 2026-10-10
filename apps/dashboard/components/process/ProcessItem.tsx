@@ -6,6 +6,7 @@ import ProcessAction from "./ProcessActionRow";
 import ProcessChart from "./ProcessChart";
 import ProcessHeader from "./ProcessHeader";
 import ProcessLog from "./ProcessLog";
+import ProcessMeta from "./ProcessMeta";
 import ProcessMetricRow from "./ProcessMetricRow";
 
 interface ProcessItemProps {
@@ -54,6 +55,7 @@ export default function ProcessItem({ process, setting }: ProcessItemProps) {
             <ProcessAction processId={process._id} collapse={() => setCollapsed(!collapsed)} />
           </Group>
         </Group>
+        <ProcessMeta name={process.name} />
         <Transition transition="scale-y" duration={500} mounted={!collapsed}>
           {(styles) => (
             <div style={{ ...styles }}>
