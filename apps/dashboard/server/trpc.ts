@@ -37,7 +37,14 @@ const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
   });
 });
 
-export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
+const blockLegacyMutations = t.middleware(({ type, next }) => {
+  if (process.env.PM2_WEB_READ_ONLY === "1" && type === "mutation") {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Legacy PM2 dashboard is read-only on the Docker host." });
+  }
+  return next();
+});
+
+export const protectedProcedure = t.procedure.use(enforceUserIsAuthed).use(blockLegacyMutations);
 export const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
   if (!ctx.user?.acl?.admin && !ctx.user?.acl?.owner) {
     throw new TRPCError({ code: "UNAUTHORIZED", message: "Owner/Admin permission required!" });
